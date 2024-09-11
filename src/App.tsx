@@ -1,5 +1,4 @@
-import React, { useState, useEffect, useRef, FormEvent, ChangeEvent } from 'react';
-import ReactDOM from 'react-dom/client';
+import { useState, useEffect, useRef, FormEvent, ChangeEvent } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 
 interface Message {
@@ -392,9 +391,10 @@ function TabWrapper() {
   );
 }
 
-const root = document.getElementById('root')!;
-ReactDOM.createRoot(root).render(
-  <React.StrictMode>
+function App() {
+  return (
     <TabWrapper />
-  </React.StrictMode>
-);
+  );
+}
+
+export default App;
