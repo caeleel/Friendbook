@@ -1,3 +1,5 @@
+'use client'
+
 import { useState, useEffect, useRef, FormEvent, ChangeEvent } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -7,10 +9,14 @@ interface Message {
   time: number;
 }
 
-const uuid = localStorage.getItem('uuid') || uuidv4();
-localStorage.setItem('uuid', uuid);
+let uuid = ''
+let threadId: string | null = null
 
-let threadId: string | null = localStorage.getItem('threadId') || null;
+if (typeof window !== 'undefined') {
+  uuid = localStorage.getItem('uuid') || uuidv4();
+  localStorage.setItem('uuid', uuid);
+  threadId = localStorage.getItem('threadId') || null;
+}
 
 async function fetchMessages(): Promise<Message[]> {
   const response = await fetch(`http://localhost:3000/chat/${uuid}`);
@@ -334,7 +340,7 @@ function FriendProfileView({ friend, onBack }: FriendProfileViewProps) {
   );
 }
 
-function TabWrapper() {
+export default function TabWrapper() {
   const [activeTab, setActiveTab] = useState('Home');
 
   useEffect(() => {
@@ -390,11 +396,3 @@ function TabWrapper() {
     </div>
   );
 }
-
-function App() {
-  return (
-    <TabWrapper />
-  );
-}
-
-export default App;
