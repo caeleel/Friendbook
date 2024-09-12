@@ -21,7 +21,6 @@ if (typeof window !== 'undefined') {
 async function fetchMessages(): Promise<Message[]> {
   const response = await fetch(`/api/chat/${uuid}`);
   const data = await response.json();
-  console.log(messages);
   return data.messages;
 }
 
