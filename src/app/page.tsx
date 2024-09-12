@@ -19,7 +19,7 @@ if (typeof window !== 'undefined') {
 }
 
 async function fetchMessages(): Promise<Message[]> {
-  const response = await fetch(`http://localhost:3000/chat/${uuid}`);
+  const response = await fetch(`/api/chat/${uuid}`);
   const data = await response.json();
   const messages = data.messages.map((msg: string) => JSON.parse(msg));
   console.log(messages);
@@ -27,7 +27,7 @@ async function fetchMessages(): Promise<Message[]> {
 }
 
 async function sendMessage(message: string): Promise<string> {
-  const response = await fetch(`http://localhost:3000/chat`, {
+  const response = await fetch(`/api/chat`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -156,7 +156,7 @@ function FriendsView() {
   useEffect(() => {
     const fetchFriends = async () => {
       try {
-        const response = await fetch(`http://localhost:3000/friends/${uuid}`);
+        const response = await fetch(`/api/friends/${uuid}`);
         if (!response.ok) {
           throw new Error('Failed to fetch friends');
         }
@@ -271,7 +271,7 @@ function FriendProfileView({ friend, onBack }: FriendProfileViewProps) {
   useEffect(() => {
     const fetchFriendInfo = async () => {
       try {
-        const response = await fetch(`http://localhost:3000/friend/${uuid}/${friend.name}/${friend.id}`);
+        const response = await fetch(`/api/friend/${uuid}/${friend.name}/${friend.id}`);
         if (!response.ok) {
           throw new Error('Failed to fetch friend info');
         }
