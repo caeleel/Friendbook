@@ -21,9 +21,8 @@ if (typeof window !== 'undefined') {
 async function fetchMessages(): Promise<Message[]> {
   const response = await fetch(`/api/chat/${uuid}`);
   const data = await response.json();
-  const messages = data.messages.map((msg: string) => JSON.parse(msg));
   console.log(messages);
-  return messages;
+  return data.messages;
 }
 
 async function sendMessage(message: string): Promise<string> {
