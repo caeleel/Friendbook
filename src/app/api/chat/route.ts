@@ -5,7 +5,7 @@ import { RunSubmitToolOutputsParams } from "openai/resources/beta/threads/runs/r
 import { findPersonFromPrefix, addPerson, getPerson, updateName, addListData, setFact, removeListData, ChatMessage } from "../lib";
 
 const openai = new OpenAI();
-const assistantId = 'asst_2r7D9q1zgOEckGcUdI5p4ia9'
+const assistantId = 'asst_2dDPaflBu9s3nUXBC4Du8H73'
 
 export async function POST(request: Request) {
   try {
