@@ -24,16 +24,24 @@ async function fetchMessages(): Promise<Message[]> {
   return data.messages;
 }
 
-async function sendMessage(message: string): Promise<string> {
-  const response = await fetch(`/api/chat`, {
+async function sendMessage(message: string): Promise<void> {
+  // Send the message without waiting for a response
+  fetch(`/api/chat`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({ message, threadId, uuid }),
-  });
-  const data = await response.json();
-  return data.message;
+  })
+    .then(response => {
+      // Handle the response if needed, but do not block the execution
+      return response.json().then(data => {
+        console.log("Message sent successfully:", data);
+      });
+    })
+    .catch(error => {
+      console.error('Error sending message:', error);
+    });
 }
 
 function ChatApp() {
@@ -68,42 +76,26 @@ function ChatApp() {
       setInput('');
       setIsTyping(true);
 
-      try {
-        // Send the message without waiting for a response
-        sendMessage(input).then(() => {
-          console.log("Message sent, starting polling for response...");
-          pollResponse(); // Start polling immediately after sending
-        }).catch(error => {
-          console.error('Error sending message:', error);
+      // Send the message without waiting for a response
+      console.log("Sending message:", input);
+      sendMessage(input);
+
+      // Start polling for the response
+      const pollResponse = async () => {
+        console.log("Polling for message status...");
+        const response = await fetchMessages(); // Fetch messages to check for a response
+        const assistantMessage = response.find(msg => msg.role === 'assistant');
+
+        if (assistantMessage) {
           setIsTyping(false);
-          setMessages(prevMessages => [
-            ...prevMessages,
-            { content: (error as Error).message, role: 'assistant', time: Date.now() }
-          ]);
-        });
-      } catch (error) {
-        console.error('Error sending message:', error);
-        setIsTyping(false);
-        setMessages(prevMessages => [
-          ...prevMessages,
-          { content: (error as Error).message, role: 'assistant', time: Date.now() }
-        ]);
-      }
-    }
-  };
+          setMessages(prevMessages => [...prevMessages, assistantMessage]);
+        } else {
+          console.log("No response yet, polling again...");
+          setTimeout(pollResponse, 1000); // Poll every second
+        }
+      };
 
-  // Polling function
-  const pollResponse = async () => {
-    console.log("Polling for message status...");
-    const response = await fetchMessages(); // Fetch messages to check for a response
-    const assistantMessage = response.find(msg => msg.role === 'assistant');
-
-    if (assistantMessage) {
-      setIsTyping(false);
-      setMessages(prevMessages => [...prevMessages, assistantMessage]);
-    } else {
-      console.log("No response yet, polling again...");
-      setTimeout(pollResponse, 1000); // Poll every second
+      pollResponse(); // Start polling immediately after sending
     }
   };
 
