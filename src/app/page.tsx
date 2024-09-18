@@ -24,24 +24,16 @@ async function fetchMessages(): Promise<Message[]> {
   return data.messages;
 }
 
-async function sendMessage(message: string): Promise<void> {
-  // Send the message without waiting for a response
-  fetch(`/api/chat`, {
+async function sendMessage(message: string): Promise<string> {
+  const response = await fetch(`/api/chat`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({ message, threadId, uuid }),
-  })
-    .then(response => {
-      // Handle the response if needed, but do not block the execution
-      return response.json().then(data => {
-        console.log("Message sent successfully:", data);
-      });
-    })
-    .catch(error => {
-      console.error('Error sending message:', error);
-    });
+  });
+  const data = await response.json();
+  return data.message;
 }
 
 function ChatApp() {
@@ -76,26 +68,14 @@ function ChatApp() {
       setInput('');
       setIsTyping(true);
 
-      // Send the message without waiting for a response
-      console.log("Sending message:", input);
-      sendMessage(input);
-
-      // Start polling for the response
-      const pollResponse = async () => {
-        console.log("Polling for message status...");
-        const response = await fetchMessages(); // Fetch messages to check for a response
-        const assistantMessage = response.find(msg => msg.role === 'assistant');
-
-        if (assistantMessage) {
-          setIsTyping(false);
-          setMessages(prevMessages => [...prevMessages, assistantMessage]);
-        } else {
-          console.log("No response yet, polling again...");
-          setTimeout(pollResponse, 1000); // Poll every second
-        }
-      };
-
-      pollResponse(); // Start polling immediately after sending
+      try {
+        const response = await sendMessage(input);
+        setIsTyping(false);
+        setMessages(prevMessages => [...prevMessages, { content: response, role: 'assistant' as const, time: Date.now() }]);
+      } catch (error) {
+        console.error('Error sending message:', error);
+        setIsTyping(false);
+      }
     }
   };
 
