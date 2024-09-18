@@ -69,8 +69,6 @@ function ChatApp() {
       setIsTyping(true);
 
       try {
-        await sendMessage(input);
-
         // Poll for the response to handle long api response time
         const pollResponse = async () => {
           const response = await fetchMessages();
