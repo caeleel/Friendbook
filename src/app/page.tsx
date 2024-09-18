@@ -69,12 +69,28 @@ function ChatApp() {
       setIsTyping(true);
 
       try {
-        const response = await sendMessage(input);
-        setIsTyping(false);
-        setMessages(prevMessages => [...prevMessages, { content: response, role: 'assistant' as const, time: Date.now() }]);
+        await sendMessage(input);
+
+        // Poll for the response to handle long api response time
+        const pollResponse = async () => {
+          const response = await fetchMessages();
+          const assistantMessage = response.find(msg => msg.role === 'assistant');
+          if (assistantMessage) {
+            setIsTyping(false);
+            setMessages(prevMessages => [...prevMessages, assistantMessage]);
+          } else {
+            setTimeout(pollResponse, 1000); // Poll every second
+          }
+        };
+
+        pollResponse();
       } catch (error) {
         console.error('Error sending message:', error);
         setIsTyping(false);
+        setMessages(prevMessages => [
+          ...prevMessages,
+          { content: "Sorry, I ran into an error.", role: 'assistant', time: Date.now() }
+        ]);
       }
     }
   };
