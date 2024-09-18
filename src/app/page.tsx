@@ -79,6 +79,7 @@ function ChatApp() {
             setIsTyping(false);
             setMessages(prevMessages => [...prevMessages, assistantMessage]);
           } else {
+            console.log("setting timeout for pollResponse");
             setTimeout(pollResponse, 1000); // Poll every second
           }
         };
@@ -89,7 +90,7 @@ function ChatApp() {
         setIsTyping(false);
         setMessages(prevMessages => [
           ...prevMessages,
-          { content: "Sorry, I ran into an error.", role: 'assistant', time: Date.now() }
+          { content: error.message, role: 'assistant', time: Date.now() }
         ]);
       }
     }
