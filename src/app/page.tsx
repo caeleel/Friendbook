@@ -90,7 +90,7 @@ function ChatApp() {
         setIsTyping(false);
         setMessages(prevMessages => [
           ...prevMessages,
-          { content: error.message, role: 'assistant', time: Date.now() }
+          { content: (error as Error).message, role: 'assistant', time: Date.now() }
         ]);
       }
     }
