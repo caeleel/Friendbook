@@ -69,20 +69,18 @@ function ChatApp() {
       setIsTyping(true);
 
       try {
-        // Poll for the response to handle long api response time
-        const pollResponse = async () => {
-          const response = await fetchMessages();
-          const assistantMessage = response.find(msg => msg.role === 'assistant');
-          if (assistantMessage) {
-            setIsTyping(false);
-            setMessages(prevMessages => [...prevMessages, assistantMessage]);
-          } else {
-            console.log("setting timeout for pollResponse");
-            setTimeout(pollResponse, 1000); // Poll every second
-          }
-        };
-
-        pollResponse();
+        // Send the message without waiting for a response
+        sendMessage(input).then(() => {
+          console.log("Message sent, starting polling for response...");
+          pollResponse(); // Start polling immediately after sending
+        }).catch(error => {
+          console.error('Error sending message:', error);
+          setIsTyping(false);
+          setMessages(prevMessages => [
+            ...prevMessages,
+            { content: (error as Error).message, role: 'assistant', time: Date.now() }
+          ]);
+        });
       } catch (error) {
         console.error('Error sending message:', error);
         setIsTyping(false);
@@ -91,6 +89,21 @@ function ChatApp() {
           { content: (error as Error).message, role: 'assistant', time: Date.now() }
         ]);
       }
+    }
+  };
+
+  // Polling function
+  const pollResponse = async () => {
+    console.log("Polling for message status...");
+    const response = await fetchMessages(); // Fetch messages to check for a response
+    const assistantMessage = response.find(msg => msg.role === 'assistant');
+
+    if (assistantMessage) {
+      setIsTyping(false);
+      setMessages(prevMessages => [...prevMessages, assistantMessage]);
+    } else {
+      console.log("No response yet, polling again...");
+      setTimeout(pollResponse, 1000); // Poll every second
     }
   };
 
