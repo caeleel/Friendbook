@@ -11,7 +11,7 @@ interface ChatMessage {
 }
 
 const openai = new OpenAI();
-const assistantId = 'asst_2r7D9q1zgOEckGcUdI5p4ia9'
+const assistantId = 'asst_2dDPaflBu9s3nUXBC4Du8H73'
 const redisClient = redis.createClient();
 
 redisClient.on('error', (err) => {
@@ -352,7 +352,7 @@ function handleNotFound(res: http.ServerResponse) {
   res.end('Not Found');
 }
 
-const PORT = 3000;
+const PORT = 3012;
 server.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
 });
